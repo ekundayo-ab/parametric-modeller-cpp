@@ -11,31 +11,41 @@ bool exit()
 
 int main(int argc, char* argv[]) {
 	SDL_Window *window;
+	SDL_Renderer* renderer = NULL;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
 		return 1;
 	}
 
-	window = SDL_CreateWindow("Hello World", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 600, 480, SDL_WINDOW_OPENGL);
+	int windowCreationRes = 0;
+	windowCreationRes = SDL_CreateWindowAndRenderer(640, 480, 0, &window, &renderer);
 
-	if (window == NULL) {
+	if (windowCreationRes != 0) {
 		printf("Could not create window: %s\n", SDL_GetError());
 		return 1;
 	}
 
-	int scanCode = 0;
-
+	bool quitApp = false;
 	SDL_Event event;
 
-	while (scanCode != SDL_SCANCODE_C) {
+	while (!quitApp) {
     while (SDL_PollEvent(&event)) {
-			std::cout << event.type << "\n";
-			scanCode = event.key.keysym.scancode;
-        /* handle your event here */
+			if ((event.window.event == SDL_WINDOWEVENT_CLOSE) || event.type == SDL_QUIT) {
+				quitApp = true;
+			}
+
+			SDL_SetRenderDrawColor(renderer, 246, 246, 246, 255);
+			SDL_RenderClear(renderer);
+
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_GL_ACCUM_BLUE_SIZE);
+			SDL_RenderDrawLine(renderer, 320, 200, 300, 240);
+			SDL_RenderDrawLine(renderer, 300, 240, 340, 240);
+			SDL_RenderDrawLine(renderer, 340, 240, 320, 200);
+			SDL_RenderPresent(renderer);
     }
-    /* do some other stuff here -- draw your app, etc. */
 	}
+
 
 	SDL_DestroyWindow(window);
 
